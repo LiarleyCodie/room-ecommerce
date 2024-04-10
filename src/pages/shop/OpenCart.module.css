@@ -1,0 +1,15 @@
+.itemsAmountIndicator::before {
+  content: attr(data-count);
+  display: flex;
+  position: absolute;
+  background: #f59e0b;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  border-radius: 100%;
+  font-weight: 600;
+  top: -0.3rem;
+  right: -0.3rem;
+  color: #171717;
+  justify-content: center;
+  align-items: center;
+}
