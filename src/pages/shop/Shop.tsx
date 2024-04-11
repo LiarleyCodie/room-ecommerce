@@ -1,41 +1,66 @@
 import iconSearch from "../../assets/icon-search.svg"
 import iconShoppingCart from "../../assets/icon-shopping-cart.svg"
-import iconShoppingCartWhite from "../../assets/icon-shopping-cart-white.svg"
+import iconX from "../../assets/icon-shopping-cart-x.svg"
 
-import { MouseEvent } from "react"
-
-import OpenCartButtonStyles from "./OpenCart.module.css"
+import { useState, useCallback } from "react"
+import OpenCartButton from "../../ui/shop/OpenCartButton"
+import ShoppingCartModal from "../../ui/shop/ShoppingCartModal"
 
 interface IShopItems {
-  id: number
+  id: string
   title: string
   price: number
   imageSrc: string
+  isInTheCart: boolean
 }
 
-const shopItemsGrid = new Map<string, IShopItems>()
+// shopItemsGrid pode ser apenas um pequeno grupo de produtos de um banco de dados. Ou seja, nunca
+// o banco de dados inteiro.
 
-for (let i = 0; i < 8; i++) {
-  const item = {
-    id: i + 1,
-    title: "Vitra Organic Chair Organic Chair",
-    price: 236.99,
-    imageSrc: "/vitra-organic-chair.png",
-  }
-  // shopItemsGrid.push(item)
-  shopItemsGrid.set((i + 1).toString(), item)
-}
+// quando um item for adicionado no carrinho ele deve ser adicionado a uma nova lista
 
 function Shop() {
-  const amountOfItemsInCart = 2
-  function handleAddItemToCart(e: MouseEvent) {
-    if (e.target) {
-      const target = e.target as HTMLButtonElement
+  const [shopItems, setShopItems] = useState<Map<string, IShopItems>>(
+    function () {
+      const initialItems = new Map<string, IShopItems>()
 
-      const itemId = target?.parentElement?.parentElement?.getAttribute('itemid')
-      console.log(itemId);
-      
-    }
+      for (let i = 0; i < 8; i++) {
+        const item = {
+          id: (i + 1).toString(),
+          title: "Vitra Organic Chair Organic Chair",
+          price: 236.99,
+          imageSrc: "/vitra-organic-chair.png",
+          isInTheCart: false,
+        }
+        initialItems.set((i + 1).toString(), item)
+      }
+
+      return initialItems
+    },
+  )
+  const [isShoppingModalVisible, setIsShoppingModalVisible] = useState(false)
+
+  const handleToggleAddOrRemoveItemToCart = useCallback(
+    (itemId: string) => {
+      setShopItems((prevItems) => {
+        const updatedItems = new Map(prevItems)
+
+        const item = updatedItems.get(itemId)
+        if (item) {
+          updatedItems.set(itemId, { ...item, isInTheCart: !item.isInTheCart })
+        }
+
+        return updatedItems
+      })
+    },
+    [setShopItems],
+  )
+
+  const handleOpenShoppingModal = () => {
+    setIsShoppingModalVisible(true)
+  }
+  const handleCloseShoppingModal = () => {
+    setIsShoppingModalVisible(false)
   }
 
   return (
@@ -59,7 +84,7 @@ function Shop() {
       <section className="flex justify-center px-16 py-20">
         <div className="flex w-56 flex-wrap gap-8 md:w-[30rem] lg:w-[46rem] 2xl:w-[62rem]">
           {/* Product Card */}
-          {Array.from(shopItemsGrid.entries()).map(([key, item]) => (
+          {Array.from(shopItems.entries()).map(([key, item]) => (
             <div
               key={key}
               itemID={item.id.toString()}
@@ -77,33 +102,46 @@ function Shop() {
                 <p className="my-2 text-2xl font-bold text-orange-800">
                   $ {item.price}
                 </p>
-                <button
-                  className="group flex items-center justify-center gap-2 border border-black/50 py-1 text-black/50 hover:border-stone-300 hover:bg-stone-300 hover:text-black/75"
-                  onClick={handleAddItemToCart}
-                >
-                  Add to Cart{" "}
-                  <img
-                    src={iconShoppingCart}
-                    className="pointer-events-none opacity-50 group-hover:opacity-75"
-                    alt="cart icon"
-                  />
-                </button>
+
+                {item.isInTheCart ? (
+                  <button
+                    className="group flex items-center justify-center gap-2 border bg-stone-800 py-1 text-stone-200   hover:bg-stone-600"
+                    onClick={() => handleToggleAddOrRemoveItemToCart(item.id)}
+                  >
+                    Remove from Cart{" "}
+                    <img
+                      src={iconX}
+                      className="pointer-events-none opacity-50 group-hover:opacity-75"
+                      alt="cart icon"
+                    />
+                  </button>
+                ) : (
+                  <button
+                    className="group flex items-center justify-center gap-2 border border-black/50 py-1 text-black/50 hover:border-stone-300 hover:bg-stone-300 hover:text-black/75"
+                    onClick={() => handleToggleAddOrRemoveItemToCart(item.id)}
+                  >
+                    Add to Cart{" "}
+                    <img
+                      src={iconShoppingCart}
+                      className="pointer-events-none opacity-50 group-hover:opacity-75"
+                      alt="cart icon"
+                    />
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Open Cart */}
-        <button
-          data-count={amountOfItemsInCart}
-          className={`duration-300" fixed bottom-0 right-0 mb-2 mr-2 flex h-16 w-16 items-center justify-center rounded-full bg-orange-800 shadow-lg hover:bg-orange-600 md:mb-8 md:mr-8 ${amountOfItemsInCart && OpenCartButtonStyles.itemsAmountIndicator}`}
-        >
-          <img
-            src={iconShoppingCartWhite}
-            className="w-7"
-            alt="shoping cart icon white"
+        {isShoppingModalVisible && (
+          <ShoppingCartModal
+            handleOpenShoppingModal={handleCloseShoppingModal}
           />
-        </button>
+        )}
+        <OpenCartButton
+          amountOfItemsInCart={2}
+          handleOpenShoppingModal={handleOpenShoppingModal}
+        />
       </section>
     </main>
   )
