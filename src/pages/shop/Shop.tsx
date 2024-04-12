@@ -14,11 +14,6 @@ export interface IShopItems {
   isInTheCart: boolean
 }
 
-// shopItemsGrid pode ser apenas um pequeno grupo de produtos de um banco de dados. Ou seja, nunca
-// o banco de dados inteiro.
-
-// quando um item for adicionado no carrinho ele deve ser adicionado a uma nova lista
-
 function Shop() {
   const [shopItems, setShopItems] = useState<Map<string, IShopItems>>(
     function () {
