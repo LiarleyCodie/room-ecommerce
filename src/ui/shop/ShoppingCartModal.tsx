@@ -1,12 +1,17 @@
 import { useEffect } from "react"
 import iconClose from "../../assets/icon-close.svg"
+import { IShopItems } from "../../pages/shop/Shop"
 
 interface IShoppingCartModalProps {
   handleOpenShoppingModal: () => void
+  itemsInCartData: Map<string, IShopItems>
+  handleRemoveItemFromCart: (itemId: string) => void
 }
 
 function ShoppingCartModal({
   handleOpenShoppingModal,
+  itemsInCartData,
+  handleRemoveItemFromCart
 }: IShoppingCartModalProps) {
   useEffect(() => {
     document.body.style.overflow = "hidden"
@@ -18,6 +23,8 @@ function ShoppingCartModal({
 
   const arrLen = new Array(5)
   arrLen.fill("hi", 0, arrLen.length)
+
+  console.log(itemsInCartData)
 
   return (
     <>
@@ -39,8 +46,8 @@ function ShoppingCartModal({
           <h3 className="mb-4 text-center text-xl font-semibold text-stone-500">
             Products you added to your cart
           </h3>
-          
-          <div className="max-h-[22rem] overflow-y-auto">
+
+          <div className={`max-h-[22rem] ${itemsInCartData.size ? 'overflow-y-auto' : ''}`}>
             <table className="w-full border text-center">
               <thead className="text-stone-500">
                 <tr>
@@ -50,12 +57,13 @@ function ShoppingCartModal({
                 </tr>
               </thead>
               <tbody className="border font-semibold">
-                {arrLen.map((x, i) => (
-                  <tr className="border" key={i}>
-                    <td>Trakinas de limones</td>
-                    <td className="border-l border-r">$ 1,50</td>
+                {Array.from(itemsInCartData).map(([key, item]) => (
+                  <tr className="border" key={key}>
+                    <td>{item.title}</td>
+                    <td className="border-l border-r">$ {item.price}</td>
                     <td>
-                      <button className="m-1 h-8 w-20 border border-red-800 font-normal text-red-900 duration-300 hover:bg-red-800 hover:text-white active:bg-red-500">
+                      <button className="m-1 h-8 w-20 border border-red-800 font-normal text-red-900 duration-300 hover:bg-red-800 hover:text-white active:bg-red-500"
+                      onClick={() => handleRemoveItemFromCart(item.id)}>
                         Remove
                       </button>
                     </td>

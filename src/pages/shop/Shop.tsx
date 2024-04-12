@@ -6,11 +6,11 @@ import { useState, useCallback } from "react"
 import OpenCartButton from "../../ui/shop/OpenCartButton"
 import ShoppingCartModal from "../../ui/shop/ShoppingCartModal"
 
-interface IShopItems {
+export interface IShopItems {
   id: string
   title: string
   price: number
-  imageSrc: string
+  imageSrc?: string
   isInTheCart: boolean
 }
 
@@ -38,22 +38,66 @@ function Shop() {
       return initialItems
     },
   )
+  const [itemsInCart, setItemsInCart] = useState<Map<string, IShopItems>>(
+    new Map(),
+  )
   const [isShoppingModalVisible, setIsShoppingModalVisible] = useState(false)
 
-  const handleToggleAddOrRemoveItemToCart = useCallback(
+  const handleAddItemToCart = useCallback(
     (itemId: string) => {
       setShopItems((prevItems) => {
         const updatedItems = new Map(prevItems)
-
-        const item = updatedItems.get(itemId)
+        let item: IShopItems | undefined | null = updatedItems.get(itemId)
         if (item) {
-          updatedItems.set(itemId, { ...item, isInTheCart: !item.isInTheCart })
+          updatedItems.set(itemId, { ...item, isInTheCart: true })
         }
+
+        setItemsInCart((prevCartItems) => {
+          const updatedCartItems = new Map(prevCartItems)
+
+          if (item) {
+            updatedCartItems.set(itemId, item)
+          }
+
+          item = null
+
+          return updatedCartItems
+        })
 
         return updatedItems
       })
     },
-    [setShopItems],
+    [setShopItems, setItemsInCart],
+  )
+
+  const handleRemoveItemFromCart = useCallback(
+    (itemId: string) => {
+      setShopItems((prevItems) => {
+        const updatedItems = new Map(prevItems)
+
+        let item: IShopItems | undefined | null = updatedItems.get(itemId)
+        if (item) {
+          updatedItems.set(itemId, { ...item, isInTheCart: false })
+        }
+
+        setItemsInCart((prevCartItems) => {
+          const updatedCartItems = new Map(prevCartItems)
+
+          if (item) {
+            updatedCartItems.delete(itemId)
+          }
+
+          item = null
+
+          return updatedCartItems
+        })
+
+        return updatedItems
+      })
+
+      console.log("hello")
+    },
+    [setShopItems, setItemsInCart],
   )
 
   const handleOpenShoppingModal = () => {
@@ -106,7 +150,7 @@ function Shop() {
                 {item.isInTheCart ? (
                   <button
                     className="group flex items-center justify-center gap-2 border bg-stone-800 py-1 text-stone-200   hover:bg-stone-600"
-                    onClick={() => handleToggleAddOrRemoveItemToCart(item.id)}
+                    onClick={() => handleRemoveItemFromCart(item.id)}
                   >
                     Remove from Cart{" "}
                     <img
@@ -118,7 +162,7 @@ function Shop() {
                 ) : (
                   <button
                     className="group flex items-center justify-center gap-2 border border-black/50 py-1 text-black/50 hover:border-stone-300 hover:bg-stone-300 hover:text-black/75"
-                    onClick={() => handleToggleAddOrRemoveItemToCart(item.id)}
+                    onClick={() => handleAddItemToCart(item.id)}
                   >
                     Add to Cart{" "}
                     <img
@@ -136,10 +180,13 @@ function Shop() {
         {isShoppingModalVisible && (
           <ShoppingCartModal
             handleOpenShoppingModal={handleCloseShoppingModal}
+            itemsInCartData={itemsInCart}
+            handleRemoveItemFromCart={handleRemoveItemFromCart}
           />
         )}
+
         <OpenCartButton
-          amountOfItemsInCart={2}
+          amountOfItemsInCart={itemsInCart.size}
           handleOpenShoppingModal={handleOpenShoppingModal}
         />
       </section>
