@@ -25,7 +25,7 @@ export function Navbar() {
     setNavbarVisibility(!navbarVisibility)
   }
 
-  const navLinkDefaultStyles = `relative before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-[0] before:h-1 before:bg-black before:lg:bg-white before:rounded-full before:duration-300 before:opacity-0 p-2 opacity-75 hover:opacity-100 ${isInAboutOrContactPath ? "before:lg:bg-black" : ""}`
+  const navLinkDefaultStyles = `relative before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-[0] before:h-1 before:bg-black before:rounded-full before:duration-300 before:opacity-0 p-2 opacity-75 hover:opacity-100 ${isInAboutOrContactPath ? "before:lg:bg-black" : "before:lg:bg-white"}`
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll)
@@ -43,15 +43,15 @@ export function Navbar() {
         />
       </Link>
       <nav
-        className={`fixed left-0 top-0 z-10 flex h-28 w-full -translate-y-full items-center justify-end gap-3 bg-white pr-6 text-sm font-bold leading-none duration-200 lg:relative lg:h-20 lg:translate-y-0 lg:justify-start lg:bg-transparent lg:px-16 lg:pr-0 lg:text-base lg:font-semibold lg:text-white ${
+        className={`fixed left-0 top-0 z-10 flex h-28 w-full -translate-y-full items-center justify-end gap-3 bg-white pr-6 text-sm font-bold leading-none duration-200 lg:relative lg:h-20 lg:translate-y-0 lg:justify-start lg:bg-transparent lg:px-16 lg:pr-0 lg:text-base lg:font-semibold ${
           navbarVisibility && navbarStyles.active
-        } ${isInAboutOrContactPath && "lg:text-black"}`}
+        } ${isInAboutOrContactPath ? "lg:text-black" : "lg:text-white"}`}
       >
         <Link to="/">
           <img
             src={logoRoom}
             alt="logo room"
-            className={`hidden md:block mr-8 h-auto w-20 ${isInAboutOrContactPath && "invert"}`}
+            className={`mr-8 hidden h-auto w-20 md:block ${isInAboutOrContactPath && "invert"}`}
           />
         </Link>
 
@@ -97,7 +97,7 @@ export function Navbar() {
         </NavLink>
       </nav>
       <button
-        className={`fixed left-0 z-10 ml-4 flex h-12 w-12 items-center justify-center  ${isScrolled && !navbarVisibility ? "bg-stone-700/30" : ""} ${(isInAboutOrContactPath && !navbarVisibility) && 'invert'} duration-300 lg:invisible`}
+        className={`fixed left-0 z-10 ml-4 flex h-12 w-12 items-center justify-center  ${isScrolled && !navbarVisibility ? "bg-stone-700/30" : ""} ${isInAboutOrContactPath && !navbarVisibility && "invert"} duration-300 lg:invisible`}
         onClick={handleToggleNavVisibility}
       >
         {navbarVisibility ? (

@@ -1,6 +1,7 @@
 {
   "name": "room-homepage",
   "private": true,
+  "homepage": "https://liarleycodie.github.io/room-ecommerce",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
